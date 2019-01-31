@@ -50,7 +50,8 @@ class ListEmployee extends Component {
     let newArr=this.state;
     var foundIndex = newArr.employeesArr.findIndex(x => x.Id == id);
     newArr.employeesArr.splice(foundIndex,1);
-    this.setState(newArr,console.log(this.state));
+    this.setState(newArr);
+    sessionStorage.setItem('myData', JSON.stringify(newArr.employeesArr));
   }
 
   handleOk = (e) => {
@@ -84,14 +85,21 @@ class ListEmployee extends Component {
       var foundIndex = newArr.employeesArr.findIndex(x => x.Id == objEmployee.Id);
       newArr.employeesArr[foundIndex] = objEmployee;
     }
-    this.setState(newArr,console.log(this.state));
+    this.setState(newArr);
+    sessionStorage.setItem('myData', JSON.stringify(newArr.employeesArr));
     this.handleCancel();
   }
 
   componentDidMount() {
-    console.log('componentDidMount', employees);
+    const sessionStorageData=sessionStorage.getItem('myData');
     const dataFetch = this.state;
-    dataFetch.employeesArr = employees;
+    if(sessionStorageData==null){
+      sessionStorage.setItem('myData', JSON.stringify(employees));
+      dataFetch.employeesArr=employees;
+    }else{
+      dataFetch.employeesArr = JSON.parse(sessionStorageData);
+    }
+    
     this.setState(dataFetch);
   }
   render() {
