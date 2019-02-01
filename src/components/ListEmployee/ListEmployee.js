@@ -3,7 +3,6 @@ import { employees } from './mockData'
 import Employee from './Employee';
 import PopupEmployee from './PopupEmployee';
 
-
 class ListEmployee extends Component {
   constructor(props) {
     super(props);
@@ -19,7 +18,8 @@ class ListEmployee extends Component {
       employeesArr: [],
       visible: false,
       add0edit1: 0,
-      employeeEditing:newEmployee
+      employeeEditing:newEmployee,
+      searchContent:''
     }
   }
   showModal = () => {
@@ -33,7 +33,6 @@ class ListEmployee extends Component {
       visible:true,
       employeeEditing:this.state.newEmployee
     });
-    // this.showModal();
   }
   openEditPopup = (id) => {
     const _employeeEditing=this.state.employeesArr.filter((item,index)=>{
@@ -44,7 +43,6 @@ class ListEmployee extends Component {
       employeeEditing:_employeeEditing,
       visible:true
     });
-    // this.showModal();
   }
   onDeleteAnEmployee=(id)=>{
     let newArr=this.state;
@@ -65,6 +63,15 @@ class ListEmployee extends Component {
     this.setState({
       visible: false,
     });
+  }
+  handleChange=(event)=>{
+    const target = event.target;
+    const value = target.value;
+    const name = target.name;
+
+    this.setState(prevState => ({
+      [name]: value
+    }))
   }
   onClosePopup=()=>{
     this.handleCancel();
@@ -102,8 +109,19 @@ class ListEmployee extends Component {
     
     this.setState(dataFetch);
   }
+
+  doSearch=(e)=>{
+    e.preventDefault();
+    const keyword=this.refs.keyword.value;
+    this.setState({searchContent:keyword});
+  }
   render() {
-    const employeesArr = this.state.employeesArr;
+    var employeesArr = this.state.employeesArr;
+    if(this.state.searchContent.trim().length>0){
+      employeesArr=employeesArr.filter((item,index)=>{
+        return item.Name.toLowerCase().indexOf(this.state.searchContent)!==-1
+      })
+    }
     const employeesRows = [];
     if (employeesArr.length > 0) {
       employeesArr.map((item, index) => {
@@ -112,7 +130,7 @@ class ListEmployee extends Component {
         )
       })
     }
-
+    
     return (
       <>
       <PopupEmployee _add0edit1={this.state.add0edit1} isShow={this.state.visible} closePopup={this.onClosePopup} save={this.onSave} _employeeEditing={this.state.employeeEditing}>
@@ -129,6 +147,17 @@ class ListEmployee extends Component {
                     <a className="btn btn-success" onClick={this.openAddPopup}><i className="material-icons"></i> <span>Add New Employee</span></a>
                   </div>
                 </div>
+              </div>
+              <div>
+              <form className="navbar-form" role="search" onSubmit={this.doSearch}>
+  <div className="input-group">
+    <input type="text" className="form-control" placeholder="Search by name" ref="keyword" onChange={this.handleChange} />
+    <div className="input-group-btn">
+      <button className="btn btn-default" type="submit"><i className="glyphicon glyphicon-search" /></button>
+    </div>
+  </div>
+</form>
+
               </div>
               <table className="table table-striped table-hover">
                 <thead>
